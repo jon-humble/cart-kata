@@ -7,4 +7,6 @@ object Version {
 
 object Library {
   val scalaTest = "org.scalatest" %% "scalatest" % Version.ScalaTest
+  val config = "com.typesafe" % "config" % "1.3.0"
+
 }

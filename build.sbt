@@ -6,6 +6,7 @@ lazy val cart = project
 name := "cart"
 
 libraryDependencies ++= Vector(
+  Library.config,
   Library.scalaTest % "test"
 )
 
