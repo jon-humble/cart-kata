@@ -45,7 +45,7 @@ object Pricing {
       // Remove those that don't have bulk prices
       .filter(_.hasPath(BulkPrice))
       // Convert to a tuple2
-      .map(config => (config.getString(Sku), (config.getInt(BulkPrice), config.getInt(BulkAmount))))
+      .map(config => (config.getString(Sku), (config.getInt(BulkAmount), config.getInt(BulkPrice))))
       // then to a map
       .toMap[String, (Int, Int)]
 

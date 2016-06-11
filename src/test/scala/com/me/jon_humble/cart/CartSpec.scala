@@ -39,4 +39,10 @@ class CartSpec extends FlatSpec {
       (EmptyCart remove "A" checkout) == 0
     )
   }
+
+  "Checking out a cart with one item" should "equal the price of that item" in {
+    assert(
+      (EmptyCart add "A" checkout) == Pricing.price(Seq("A"))
+    )
+  }
 }

@@ -27,4 +27,40 @@ class PricingSpec extends FlatSpec {
       (EmptyCart add "A" checkout) == 50
     )
   }
+
+  "SKU B" should "be priced to 30" in {
+    assert(
+      (EmptyCart add "B" checkout) == 30
+    )
+  }
+
+  "SKU C" should "be priced to 20" in {
+    assert(
+      (EmptyCart add "C" checkout) == 20
+    )
+  }
+
+  "SKU D" should "be priced to 15" in {
+    assert(
+      (EmptyCart add "D" checkout) == 15
+    )
+  }
+
+  "SKU A" should "be have bulk pricing 3 for 130" in {
+    assert(
+      (EmptyCart add "A" add "A" add "A" checkout) == 130
+    )
+  }
+
+  "Bulk and non-bulk pricing" should "be combined for SKU A" in {
+    assert(
+      (EmptyCart add "A" add "A" add "A" add "A" checkout) == 130 + 50
+    )
+  }
+
+  "SKUs" should "be able to be mixed in the cart" in {
+    assert(
+      (EmptyCart add "B" add "A" add "B" add "C" checkout) == 45 + 50 + 20
+    )
+  }
 }
