@@ -18,14 +18,14 @@ package com.me.jon_humble.cart
 
 sealed trait Cart {
   def add(sku: SKU): Cart
-  def remove(sku: String): Cart
-  def checkout(): Int
+  def remove(sku: SKU): Cart
+  def checkout(): Price
 }
 
-private final case class FilledCart(contents: Seq[String]) extends Cart {
-  override def add(sku: String): Cart = FilledCart(contents :+ sku)
-  override def remove(sku: String): Cart = FilledCart(contents diff Seq(sku))
-  override def checkout(): Int = Pricing.price(contents)
+private final case class FilledCart(contents: Seq[SKU]) extends Cart {
+  override def add(sku: SKU): Cart = FilledCart(contents :+ sku)
+  override def remove(sku: SKU): Cart = FilledCart(contents diff Seq(sku))
+  override def checkout(): Price = Pricing.price(contents)
 }
 
 object Cart {

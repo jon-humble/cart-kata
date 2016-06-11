@@ -18,6 +18,7 @@ package com.me.jon_humble
 
 package object cart {
 
+  // Typedefs
   type SKU = String
   type Price = Int
 
