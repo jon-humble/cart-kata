@@ -16,23 +16,56 @@
 
 package com.me.jon_humble.cart
 
+/**
+ * Public interface of the shopping cart.
+ * To get an instance, use Cart.EmptyCart
+ * from the companion object.
+ */
 sealed trait Cart {
+  /**
+   * Returns a new cart with one instance of an SKU added.
+   */
   def add(sku: SKU): Cart
+
+  /**
+   * Returns a new cart with one instance of an SKU removed, if there
+   * was one, otherwise the cart unchanged.
+   */
   def remove(sku: SKU): Cart
+
+  /**
+   * Returns a new cart with the same contents but using the pricing rules in the
+   * file 'prices'. File must be on the classpath.
+   */
   def using(prices: PriceFileLocation): Cart
+
+  /**
+   * Calculates the total of the SKUs in the cart.
+   * Will use the default pricing unless overidden with a
+   * call to using(prices)
+   */
   def checkout(): Price
 }
+object Cart {
+  /**
+   * Empty cart. Used as a starting point for cart activity.
+   */
+  val EmptyCart: Cart = ShoppingCart(Vector())(None)
+}
 
-private final case class FilledCart(contents: Seq[SKU])(prices: Option[PriceFileLocation]) extends Cart {
+/*
+  Concrete implemetation of a shopping cart.
+*/
+private final case class ShoppingCart(contents: Seq[SKU])(prices: Option[PriceFileLocation]) extends Cart {
   override def add(sku: SKU): Cart = cartWith(contents :+ sku)
   override def remove(sku: SKU): Cart = cartWith(contents diff Seq(sku))
   override def using(altPrices: PriceFileLocation): Cart = cartWith(altPrices)
   override def checkout(): Price = Pricing.price(contents, prices)
 
-  def cartWith(cts: Seq[SKU]): Cart = FilledCart(cts)(prices)
-  def cartWith(pfl: PriceFileLocation) = FilledCart(contents)(Some(pfl))
-}
-
-object Cart {
-  val EmptyCart: Cart = FilledCart(Vector())(None)
+  /*
+    Helper functions - construct and return new instances of a Cart based on
+    this and the supplied parameter.
+  */
+  def cartWith(cts: Seq[SKU]): Cart = ShoppingCart(cts)(prices)
+  def cartWith(pfl: PriceFileLocation) = ShoppingCart(contents)(Some(pfl))
 }

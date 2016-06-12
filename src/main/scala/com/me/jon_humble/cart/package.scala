@@ -16,6 +16,10 @@
 
 package com.me.jon_humble
 
+/**
+ * This package object adds typedefs and constants to the
+ * package namespace.
+ */
 package object cart {
 
   // Typedefs
