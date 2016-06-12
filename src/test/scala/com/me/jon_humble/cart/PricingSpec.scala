@@ -63,4 +63,10 @@ class PricingSpec extends FlatSpec {
       (EmptyCart add "B" add "A" add "B" add "C" checkout) == 45 + 50 + 20
     )
   }
+
+  "Non existent SKUs" should "price to zero" in {
+    assert(
+      (EmptyCart add "XX" checkout) == 0
+    )
+  }
 }

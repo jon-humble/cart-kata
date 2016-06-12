@@ -55,19 +55,27 @@ object Pricing {
       .toMap[String, (Int, Int)]
 
     def price(sku: SKU, quantity: Int): Price = {
-      val unitPrice = unitPrices(sku)
-      if (hasBulkPricing(sku)) {
-        val (bulkAmount, bulkPrice) = bulkPrices(sku)
-        val batches = quantity / bulkAmount
-        val units = quantity % bulkAmount
-        (batches * bulkPrice) + (units * unitPrice)
+      if (invalidSku(sku)) {
+        0
       } else {
-        quantity * unitPrice
+        val unitPrice = unitPrices(sku)
+        if (hasBulkPricing(sku)) {
+          val (bulkAmount, bulkPrice) = bulkPrices(sku)
+          val batches = quantity / bulkAmount
+          val units = quantity % bulkAmount
+          (batches * bulkPrice) + (units * unitPrice)
+        } else {
+          quantity * unitPrice
+        }
       }
     }
 
     def hasBulkPricing(sku: SKU): Boolean = {
       bulkPrices.contains(sku)
+    }
+
+    def invalidSku(sku: SKU): Boolean = {
+      !unitPrices.contains(sku)
     }
   }
   private object Prices {
