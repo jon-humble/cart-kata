@@ -20,22 +20,27 @@ import collection.JavaConverters._
 
 object Pricing {
 
-  def price(skus: Seq[SKU]): Price = {
-    val uniqueSkus = skus.distinct
+  def price(contents: Seq[SKU]): Price = price(contents, None)
+  def price(contents: Seq[SKU], priceFileLocation: Option[PriceFileLocation]): Price = {
+    val pricer = Prices(priceFileLocation)
+    val uniqueSkus = contents.distinct
     // For each SKU, store the sku with its frequency in the skus sequence
-    val skuCounts = uniqueSkus.map(sku => (sku, skus.count(_ == sku)))
+    val skuCounts = uniqueSkus.map(sku => (sku, contents.count(_ == sku)))
     // Price each of the sku counts and return the sum
-    skuCounts.map(c => Prices.price(c._1, c._2)).fold(0)(_ + _)
+    skuCounts.map(c => pricer.price(c._1, c._2)).fold(0)(_ + _)
   }
 
-  private object Prices {
-    val config = ConfigFactory.load()
-    val objects: Seq[ConfigObject] = config.getObjectList(PriceList).asScala
+  private final class Prices(pfl: Option[PriceFileLocation]) {
+    val prices = pfl
+      .map(ConfigFactory.load(_)) // Load the price list if supplied
+      .getOrElse(ConfigFactory.load()) // or else use the default prices
+
+    val objects: Seq[ConfigObject] = prices.getObjectList(PriceList).asScala
     val unitPrices = objects
       // Map each item to a Config from ConfigObject
       .map(_.toConfig)
       // Pull out the sku and the unit price
-      .map(config => (config.getString(Sku), config.getInt(Price)))
+      .map(o => (o.getString(Sku), o.getInt(Price)))
       // Convert the sequence of tuple to a map
       .toMap[String, Int]
 
@@ -45,7 +50,7 @@ object Pricing {
       // Remove those that don't have bulk prices
       .filter(_.hasPath(BulkPrice))
       // Convert to a tuple2
-      .map(config => (config.getString(Sku), (config.getInt(BulkAmount), config.getInt(BulkPrice))))
+      .map(o => (o.getString(Sku), (o.getInt(BulkAmount), o.getInt(BulkPrice))))
       // then to a map
       .toMap[String, (Int, Int)]
 
@@ -61,7 +66,14 @@ object Pricing {
       }
     }
 
-    def hasBulkPricing(sku: SKU): Boolean = bulkPrices.contains(sku)
+    def hasBulkPricing(sku: SKU): Boolean = {
+      bulkPrices.contains(sku)
+    }
+  }
+  private object Prices {
+    def apply(altPrices: Option[PriceFileLocation]) = {
+      new Prices(altPrices)
+    }
   }
 
 }

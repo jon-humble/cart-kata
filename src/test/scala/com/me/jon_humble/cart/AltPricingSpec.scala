@@ -20,33 +20,17 @@ import org.scalatest.FlatSpec
 import scala.language.postfixOps
 import Cart.EmptyCart
 
-class CartSpec extends FlatSpec {
-
-  "An empty Cart" should "checkout to zero" in {
-    assert(
-      (EmptyCart checkout) == 0
-    )
-  }
-
-  "Adding and removing a SKU" should "checkout to zero" in {
+class AltPricingSpec extends FlatSpec {
+  val altPrices = "altPrices.conf"
+  "SKU A" should "be priced to 100" in {
     val cart = (
       EmptyCart
+      using altPrices
       add "A"
-      remove "A"
     )
-
-    assert(cart.checkout == 0)
-  }
-
-  "Removing a SKU from an empty cart" should "have no effect" in {
     assert(
-      (EmptyCart remove "A" checkout) == 0
+      (cart checkout) == 100
     )
   }
 
-  "Checking out a cart with one item" should "equal the price of that item" in {
-    assert(
-      (EmptyCart add "A" checkout) == Pricing.price(Seq("A"))
-    )
-  }
 }

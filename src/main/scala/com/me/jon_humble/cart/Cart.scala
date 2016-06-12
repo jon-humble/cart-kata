@@ -19,16 +19,20 @@ package com.me.jon_humble.cart
 sealed trait Cart {
   def add(sku: SKU): Cart
   def remove(sku: SKU): Cart
+  def using(prices: PriceFileLocation): Cart
   def checkout(): Price
 }
 
-private final case class FilledCart(contents: Seq[SKU]) extends Cart {
-  override def add(sku: SKU): Cart = FilledCart(contents :+ sku)
-  override def remove(sku: SKU): Cart = FilledCart(contents diff Seq(sku))
-  override def checkout(): Price = Pricing.price(contents)
+private final case class FilledCart(contents: Seq[SKU])(prices: Option[PriceFileLocation]) extends Cart {
+  override def add(sku: SKU): Cart = cartWith(contents :+ sku)
+  override def remove(sku: SKU): Cart = cartWith(contents diff Seq(sku))
+  override def using(altPrices: PriceFileLocation): Cart = cartWith(altPrices)
+  override def checkout(): Price = Pricing.price(contents, prices)
+
+  def cartWith(cts: Seq[SKU]): Cart = FilledCart(cts)(prices)
+  def cartWith(pfl: PriceFileLocation) = FilledCart(contents)(Some(pfl))
 }
 
 object Cart {
-  def apply(): Cart = FilledCart(Vector())
-  val EmptyCart: Cart = Cart()
+  val EmptyCart: Cart = FilledCart(Vector())(None)
 }

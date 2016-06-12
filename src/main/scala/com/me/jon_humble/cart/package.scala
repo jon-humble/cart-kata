@@ -21,6 +21,7 @@ package object cart {
   // Typedefs
   type SKU = String
   type Price = Int
+  type PriceFileLocation = String
 
   // Configuration Keys
   val PriceList = "prices"
