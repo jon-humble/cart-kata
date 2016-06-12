@@ -67,5 +67,5 @@ private final case class ShoppingCart(contents: Seq[SKU])(prices: Option[PriceFi
     this and the supplied parameter.
   */
   def cartWith(cts: Seq[SKU]): Cart = ShoppingCart(cts)(prices)
-  def cartWith(pfl: PriceFileLocation) = ShoppingCart(contents)(Some(pfl))
+  def cartWith(pfl: PriceFileLocation): Cart = ShoppingCart(contents)(Some(pfl))
 }

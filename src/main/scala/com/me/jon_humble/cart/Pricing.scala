@@ -81,6 +81,9 @@ object Pricing {
       pricer(sku)(quantity)
     }
 
+    /*
+      If a SKU has bulk pricing, use it.
+    */
     def bulkPricing: PartialFunction[SKU, (Int => Price)] = {
       case sku if hasBulkPricing(sku) => {
         quantity =>
@@ -94,12 +97,18 @@ object Pricing {
       }
     }
 
+    /*
+      For SKUs without bulk pricing
+    */
     def unitPricing: PartialFunction[SKU, (Int => Price)] = {
       case sku if isValidSku(sku) => {
         quantity => quantity * unitPrices(sku)
       }
     }
 
+    /*
+      Fallback for invalid SKUs - always returns zero
+    */
     def invalidSkuPricing: PartialFunction[SKU, (Int => Price)] = {
       case _ => quantity => 0
     }
@@ -113,7 +122,7 @@ object Pricing {
     }
   }
   private object Prices {
-    def apply(altPrices: Option[PriceFileLocation]) = {
+    def apply(altPrices: Option[PriceFileLocation]): Prices = {
       new Prices(altPrices)
     }
   }
